@@ -1,0 +1,378 @@
+{
+  "name": "Bug Report Triage for Dev Teams",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "bug-report",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -384,
+        -48
+      ],
+      "id": "efd2f0a9-3f34-4145-81b5-34fcf1b87169",
+      "name": "Webhook"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:11434/api/generate",
+        "sendBody": true,
+        "contentType": "=json",
+        "specifyBody": "json",
+        "bodyParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "jsonBody": "={\n  \"model\": \"llama3.2:3b\",\n  \"format\": \"json\",\n  \"stream\": false,\n  \"prompt\": \"You are a bug triage assistant. Analyze this bug report and respond ONLY with valid JSON in this exact format, no markdown, no explanation: {\\\"severity\\\": \\\"Critical|High|Medium|Low\\\", \\\"category\\\": \\\"UI|Backend|Security|Performance|Content|Data\\\", \\\"assigned_team\\\": \\\"Frontend|Backend|QA|Security|DevOps\\\", \\\"priority_score\\\": 1-10}\\n\\nTitle: {{ $json.body.title }}\\nDescription: {{ $json.body.description }}\\nModule: {{ $json.body.module }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -160,
+        -48
+      ],
+      "id": "267d0bac-a18b-49db-83df-d28cda2e2d92",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const aiOutput = JSON.parse($input.item.json.response);\nconst webhookData = $('Webhook').item.json.body;\n\nreturn {\n  json: {\n    ticket_id: 'BUG-' + Date.now(),\n    title: webhookData.title,\n    description: webhookData.description,\n    reporter: webhookData.reporter,\n    module: webhookData.module,\n    severity: aiOutput.severity,\n    category: aiOutput.category,\n    assigned_team: aiOutput.assigned_team,\n    priority_score: aiOutput.priority_score,\n    status: 'Open',\n    timestamp: new Date().toISOString()\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        64,
+        -48
+      ],
+      "id": "9d01d77b-68e9-4c51-946b-bd64fdb3e525",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "Bug_Tracker_Sheet_Template"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1481098748,
+          "mode": "list",
+          "cachedResultName": "Sheet1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Ticket_ID": "={{ $json.ticket_id }}",
+            "Title": "={{ $json.title }}",
+            "Description": "={{ $json.description }}",
+            "Reporter": "={{ $json.reporter }}",
+            "Module": "={{ $json.module }}",
+            "Severity": "={{ $json.severity }}",
+            "Category": "={{ $json.category }}",
+            "Assigned_Team": "={{ $json.assigned_team }}",
+            "Priority_Score": "={{ $json.priority_score }}",
+            "Status": "={{ $json.status }}",
+            "Timestamp": "={{ $json.timestamp }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Ticket_ID",
+              "displayName": "Ticket_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reporter",
+              "displayName": "Reporter",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Module",
+              "displayName": "Module",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Severity",
+              "displayName": "Severity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Assigned_Team",
+              "displayName": "Assigned_Team",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Priority_Score",
+              "displayName": "Priority_Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        288,
+        -48
+      ],
+      "id": "e8e2b83f-bacf-44a7-bb08-bbeb614b0487",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REPLACE_AFTER_IMPORT",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a0bc653b-d024-45e3-b9a4-3ab9805cd3fb",
+              "leftValue": "={{ $json.Severity }}",
+              "rightValue": "Critical",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "bb6a90f7-40b4-404d-89d8-1ab12c116e3e",
+              "leftValue": "={{ $json.Severity }}",
+              "rightValue": "High",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        512,
+        -48
+      ],
+      "id": "754e2639-53e2-4ea7-b970-4ab229a3334f",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Reporter }}",
+        "subject": "={{ $json.Severity }} Bug — {{ $json.Title }} (Ticket #{{ $json.Ticket_ID }})",
+        "emailType": "text",
+        "message": "=A new {{ $json.Severity }} severity bug has been reported.  \nTicket ID: {{ $json.Ticket_ID }} \nTitle: {{ $json.Title }} \nDescription: {{ $json.Description }} \nModule: {{ $json.Module }} \nAssigned Team: {{ $json.Assigned_Team }} \nPriority Score: {{ $json.Priority_Score }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        736,
+        -128
+      ],
+      "id": "d95140d7-74f8-4d00-ac81-52002f51daa4",
+      "name": "Send a message",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_AFTER_IMPORT",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"status\": \"received\", \"ticket_id\": $json.Ticket_ID, \"severity\": $json.Severity } }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        992,
+        -32
+      ],
+      "id": "42e683bf-e6be-4020-8efc-a3a8492f73e5",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "tags": []
+}
