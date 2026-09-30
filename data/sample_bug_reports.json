@@ -1,0 +1,10 @@
+[
+  {"title": "App crashes on login", "description": "Users on iOS 17 report a hard crash right after entering credentials and tapping login.", "reporter": "sarah.qa@company.com", "module": "Authentication"},
+  {"title": "Typo in welcome email", "description": "'Wellcome' spelled incorrectly in the onboarding email template sent to new signups.", "reporter": "hr.team@company.com", "module": "Content"},
+  {"title": "SQL injection vulnerability in search bar", "description": "Search input field does not sanitize special characters, raw SQL can be injected and returns unexpected data.", "reporter": "security.team@company.com", "module": "Security"},
+  {"title": "Dashboard loads slowly with large datasets", "description": "Analytics dashboard takes 15+ seconds to render when the account has more than 10,000 records.", "reporter": "amina.pm@company.com", "module": "Performance"},
+  {"title": "Button misaligned on checkout page", "description": "The 'Place Order' button visually overlaps with the price summary box on mobile screens under 400px width.", "reporter": "mike.dev@company.com", "module": "Frontend"},
+  {"title": "Password reset link never arrives", "description": "Some users report never receiving the password reset email, no error shown on the request form either.", "reporter": "support@company.com", "module": "Authentication"},
+  {"title": "Export to CSV produces corrupted file", "description": "Downloaded CSV opens with garbled characters in Excel for accounts using non-English names.", "reporter": "farah.ops@company.com", "module": "Data Export"},
+  {"title": "Admin panel accessible without login on staging", "description": "On the staging server, /admin route loads directly without redirecting to the login page, exposing user data.", "reporter": "devops@company.com", "module": "Security"}
+]
